@@ -1,9 +1,9 @@
 import React from "react";
-import {  signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase"
+import {  signInWithEmailAndPassword, GoogleAuthProvider,signInWithPopup } from "firebase/auth";
+import { auth, db } from "../firebase"
+import { addDoc, getDocs, query, collection, where } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";
-
 
 const Login = () => {
 
@@ -28,6 +28,30 @@ const Login = () => {
         }
     };
 
+    const googleProvider = new GoogleAuthProvider();
+    const signInWithGoogle = async () => {
+        try {
+            const res = await signInWithPopup(auth, googleProvider);
+            const user = res.user;
+            const q = query( collection(db, "users"), where("uid", "==", user.uid) );
+            const docs = await getDocs(q);
+            if (docs.docs.length === 0) {
+                await addDoc(collection(db, "users"), {
+                    name: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    uid: user.uid,
+                });
+            }
+            navigate("/");
+        } catch (err) {
+            setErr(true);
+            console.error(err);
+            alert(err.message);
+        }
+    };
+
+
     return (
         <div className="formContainer">
             <div className="formWrapper">
@@ -40,6 +64,11 @@ const Login = () => {
                     <button id="sign_up_button">Sign In</button>
                     {err && <span>Something went wrong</span>}
                 </form>
+
+                <button id="log_in_google" placeholder="Log in with google" onClick={signInWithGoogle}
+                
+                >
+                    Log In with Google</button>
                 <p id="log_in_text">You have an account? <Link to="/register">Register</Link></p>
             </div>
         </div>
