@@ -27,7 +27,7 @@ const Register = () => {
             const date = new Date().getTime();
             const storageRef = ref(storage, `${displayName + date}`);
 
-
+            console.log(file);
             await uploadBytesResumable(storageRef, file).then(() => {
                 getDownloadURL(storageRef).then(async (downloadURL) => {
                   try {

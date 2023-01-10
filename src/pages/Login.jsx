@@ -1,14 +1,18 @@
 import React from "react";
 import {  signInWithEmailAndPassword, GoogleAuthProvider,signInWithPopup } from "firebase/auth";
 import { auth, db } from "../firebase"
-import { addDoc, getDocs, query, collection, where } from "firebase/firestore";
+import { addDoc, getDocs, query, collection, where, setDoc, doc, onSnapshot } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const Login = () => {
 
     const [err , setErr] = useState(false);
     const navigate = useNavigate();
+    // const [chats, setChats] = useState([]);
+
+    // const { currentUser } = useContext(AuthContext);
 
     const handleSubmit = async (e) =>{
         e.preventDefault()
@@ -43,6 +47,12 @@ const Login = () => {
                     uid: user.uid,
                 });
             }
+
+            //setting empty chats on firebase
+            await setDoc(doc(db, "userChats", res.user.uid), {});
+            
+
+
             navigate("/");
         } catch (err) {
             setErr(true);
