@@ -16,7 +16,7 @@ import {
 } from "firebase/firestore";
 import { db, storage } from "../firebase";
 import { v4 as uuid } from "uuid";
-import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
+import { getDownloadURL, getMetadata, ref, uploadBytesResumable } from "firebase/storage";
 import Popup from "./Popup";
 
 
@@ -92,11 +92,16 @@ const Input = () => {
       type: "image/png"
     });
 
+    const metadata = {
+      contentType: 'image/png'
+    };
+    
+
     console.log(sticker_file)
     if (sticker_file) {
       const storageRef = ref(storage, uuid());
       console.log(sticker_file);
-      const uploadTask = uploadBytesResumable(storageRef, sticker_file);
+      const uploadTask = uploadBytesResumable(storageRef, sticker_file, metadata);
 
       uploadTask.on(
         (error) => {
